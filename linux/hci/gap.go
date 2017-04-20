@@ -40,6 +40,14 @@ func (h *HCI) StopScanning() error {
 	return h.Send(&h.params.scanEnable, nil)
 }
 
+// Advertise allows complete customization of BLE advertisement data
+func (h *HCI) Advertise(ad []byte, sr []byte) error {
+	if err := h.SetAdvertisement(ad, sr); err != nil {
+		return nil
+	}
+	return h.StartAdvertising()
+}
+
 // AdvertiseNameAndServices advertises device name, and specified service UUIDs.
 // It tries to fit the UUIDs in the advertising data as much as possible.
 // If name doesn't fit in the advertising data, it will be put in scan response.
@@ -75,7 +83,7 @@ func (h *HCI) AdvertiseNameAndServices(name string, uuids ...ble.UUID) error {
 	if err := h.SetAdvertisement(ad.Bytes(), sr.Bytes()); err != nil {
 		return nil
 	}
-	return h.Advertise()
+	return h.StartAdvertising()
 }
 
 // AdvertiseMfgData avertises the given manufacturer data.
@@ -87,7 +95,7 @@ func (h *HCI) AdvertiseMfgData(id uint16, md []byte) error {
 	if err := h.SetAdvertisement(ad.Bytes(), nil); err != nil {
 		return nil
 	}
-	return h.Advertise()
+	return h.StartAdvertising()
 }
 
 // AdvertiseServiceData16 advertises data associated with a 16bit service uuid
@@ -99,7 +107,7 @@ func (h *HCI) AdvertiseServiceData16(id uint16, b []byte) error {
 	if err := h.SetAdvertisement(ad.Bytes(), nil); err != nil {
 		return nil
 	}
-	return h.Advertise()
+	return h.StartAdvertising()
 }
 
 // AdvertiseIBeaconData advertise iBeacon with given manufacturer data.
@@ -111,7 +119,7 @@ func (h *HCI) AdvertiseIBeaconData(md []byte) error {
 	if err := h.SetAdvertisement(ad.Bytes(), nil); err != nil {
 		return nil
 	}
-	return h.Advertise()
+	return h.StartAdvertising()
 }
 
 // AdvertiseIBeacon advertises iBeacon with specified parameters.
@@ -123,7 +131,7 @@ func (h *HCI) AdvertiseIBeacon(u ble.UUID, major, minor uint16, pwr int8) error 
 	if err := h.SetAdvertisement(ad.Bytes(), nil); err != nil {
 		return nil
 	}
-	return h.Advertise()
+	return h.StartAdvertising()
 }
 
 // StopAdvertising stops advertising.
@@ -188,7 +196,7 @@ func (h *HCI) Dial(ctx context.Context, a ble.Addr) (ble.Client, error) {
 }
 
 // Advertise starts advertising.
-func (h *HCI) Advertise() error {
+func (h *HCI) StartAdvertising() error {
 	h.params.advEnable.AdvertisingEnable = 1
 	return h.Send(&h.params.advEnable, nil)
 }

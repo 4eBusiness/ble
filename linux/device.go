@@ -86,9 +86,19 @@ func (d *Device) Stop() error {
 	return d.HCI.Close()
 }
 
+// Advertise allows complete customization of BLE advertisement data
+func (d *Device) Advertise(ctx context.Context, advertisingData []byte, scanResponseData []byte) error {
+	if err := d.HCI.Advertise(advertisingData, scanResponseData); err != nil {
+		return err
+	}
+	<-ctx.Done()
+	d.HCI.StopAdvertising()
+	return ctx.Err()
+}
+
 // AdvertiseNameAndServices advertises device name, and specified service UUIDs.
-// It tres to fit the UUIDs in the advertising packet as much as possible.
-// If name doesn't fit in the advertising packet, it will be put in scan response.
+// It tries to fit the UUIDs in the advertising data as much as possible.
+// If name doesn't fit in the advertising data, it will be put in scan response.
 func (d *Device) AdvertiseNameAndServices(ctx context.Context, name string, uuids ...ble.UUID) error {
 	if err := d.HCI.AdvertiseNameAndServices(name, uuids...); err != nil {
 		return err
