@@ -1,7 +1,6 @@
 package gatt
 
 import (
-	"log"
 	"sync"
 
 	"github.com/foureb/ble"
